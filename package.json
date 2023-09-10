@@ -7,8 +7,10 @@
     "prepare": "rm -rf .husky && husky install && npm run pre-commit && npm run commit-msg",
     "pre-commit": "husky add .husky/pre-commit 'npx lint-staged'",
     "commit-msg": "husky add .husky/commit-msg '.git/hooks/commit-msg \\$1'",
-    "test": "jest --passWithNoTests --watch",
-    "test:staged": "jest"
+    "test": "jest --passWithNoTests --silent --noStackTrace",
+    "test:unit": "npm test -- --watch",
+    "test:verbose": "jest --passWithNoTests",
+    "test:staged": "jest --passWithNoTests"
   },
   "keywords": [],
   "author": "",
