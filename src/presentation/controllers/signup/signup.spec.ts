@@ -9,7 +9,7 @@ const makeEmailValidator = (): EmailValidator => {
     }
   }
 
-  return new EmailValidatorStub();
+  return new EmailValidatorStub()
 }
 
 const makeAddAccount = (): AddAccount => {
@@ -22,24 +22,22 @@ const makeAddAccount = (): AddAccount => {
         password: 'valid_password'
       }
 
-      return new Promise(resolve => resolve(fakeAccount));
+      return await new Promise(resolve => { resolve(fakeAccount) })
     }
   }
 
-  return new AddAccountStub();
+  return new AddAccountStub()
 }
-
 
 interface SutTypes {
   sut: SignUpController
-  emailValidatorStub: EmailValidator,
-  addAccountStub: AddAccount,
+  emailValidatorStub: EmailValidator
+  addAccountStub: AddAccount
 }
 
-
 const makeSut = (): SutTypes => {
-  const emailValidatorStub = makeEmailValidator();
-  const addAccountStub = makeAddAccount();
+  const emailValidatorStub = makeEmailValidator()
+  const addAccountStub = makeAddAccount()
 
   const sut = new SignUpController(emailValidatorStub, addAccountStub)
 
@@ -183,12 +181,12 @@ describe('SignUp Conttroller', () => {
     expect(addAccountSpy).toHaveBeenCalledWith({
       name: 'any_name',
       email: 'any_email@mail.com',
-      password: 'any_password',
+      password: 'any_password'
     })
   })
 
   test('Should return 500 if EmailValidator throws', async () => {
-    const {sut, emailValidatorStub} = makeSut()
+    const { sut, emailValidatorStub } = makeSut()
 
     jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
       throw new Error()
@@ -209,10 +207,10 @@ describe('SignUp Conttroller', () => {
   })
 
   test('Should return 500 if AddAccount throws', async () => {
-    const {sut, addAccountStub} = makeSut()
+    const { sut, addAccountStub } = makeSut()
 
     jest.spyOn(addAccountStub, 'execute').mockImplementationOnce(async () => {
-      return new Promise((resolve, reject) => reject(new Error()))
+      return await new Promise((resolve, reject) => { reject(new Error()) })
     })
 
     const httpRequest = {
@@ -247,7 +245,7 @@ describe('SignUp Conttroller', () => {
       id: 'valid_id',
       name: 'valid_name',
       email: 'valid_email@mail.com',
-      password: 'valid_password',
+      password: 'valid_password'
     })
   })
 })
