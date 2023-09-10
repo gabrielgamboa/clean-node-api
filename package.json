@@ -4,19 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepare": "rm -rf .husky && husky install && npm run pre-commit && npm run commit-msg",
+    "pre-commit": "husky add .husky/pre-commit 'npx lint-staged'",
+    "commit-msg": "husky add .husky/commit-msg '.git/hooks/commit-msg \\$1'",
     "test": "jest --passWithNoTests --watch",
     "test:staged": "jest --passWithNoTests"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint 'src/**' --fix",
-      "npm run test:staged"
-    ]
   },
   "keywords": [],
   "author": "",
