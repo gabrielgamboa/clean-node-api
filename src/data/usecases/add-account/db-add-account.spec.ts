@@ -14,7 +14,7 @@ const makeEncrypter = (): Encrypter => {
   return new EncrypterStub()
 }
 
-const makeAddAccountRepository = (): AccountRepository => {
+const makeAccountRepository = (): AccountRepository => {
   class AccountRepositoryStub implements AccountRepository {
     async add (accountData: AddAccountModel): Promise<AccountModel> {
       const fakeAccount = {
@@ -33,15 +33,15 @@ const makeAddAccountRepository = (): AccountRepository => {
 interface SutTypes {
   sut: DbAddAccount
   encrypterStub: Encrypter
-  addAccountRepositoryStub: AccountRepository
+  accountRepository: AccountRepository
 }
 
 const makeSut = (): SutTypes => {
   const encrypterStub = makeEncrypter()
-  const addAccountRepositoryStub = makeAddAccountRepository()
-  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
+  const accountRepository = makeAccountRepository()
+  const sut = new DbAddAccount(encrypterStub, accountRepository)
 
-  return { sut, encrypterStub, addAccountRepositoryStub }
+  return { sut, encrypterStub, accountRepository }
 }
 
 describe('DbAddAccount Usecase', () => {
@@ -78,9 +78,9 @@ describe('DbAddAccount Usecase', () => {
   })
 
   test('Should call AddAccountRepository with correct values', async () => {
-    const { sut, addAccountRepositoryStub } = makeSut()
+    const { sut, accountRepository } = makeSut()
 
-    const addAccountSpy = jest.spyOn(addAccountRepositoryStub, 'add')
+    const addAccountSpy = jest.spyOn(accountRepository, 'add')
 
     const accountData: AddAccountModel = {
       name: 'valid_name',
@@ -91,6 +91,41 @@ describe('DbAddAccount Usecase', () => {
     await sut.execute(accountData)
 
     expect(addAccountSpy).toHaveBeenCalledWith({
+      name: 'valid_name',
+      email: 'valid_email',
+      password: 'hashed_password'
+    })
+  })
+
+  test('Should throw if AccountRepository add throws', async () => {
+    const { sut, accountRepository } = makeSut()
+
+    jest.spyOn(accountRepository, 'add').mockRejectedValue(new Error())
+
+    const accountData: AddAccountModel = {
+      name: 'valid_name',
+      email: 'valid_email',
+      password: 'valid_password'
+    }
+
+    const promise = sut.execute(accountData)
+
+    await expect(promise).rejects.toThrow()
+  })
+
+  test('Should return account on success', async () => {
+    const { sut } = makeSut()
+
+    const accountData: AddAccountModel = {
+      name: 'valid_name',
+      email: 'valid_email',
+      password: 'valid_password'
+    }
+
+    const account = await sut.execute(accountData)
+
+    expect(account).toEqual({
+      id: 'valid_id',
       name: 'valid_name',
       email: 'valid_email',
       password: 'hashed_password'
