@@ -6,7 +6,8 @@ const config = {
   coverageDirectory: 'coverage',
   transform: {
     '.+\\.ts$': 'ts-jest'
-  }
+  },
+  preset: '@shelf/jest-mongodb'
 }
 
 module.exports = config
